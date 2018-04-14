@@ -13,6 +13,8 @@
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
 
++ (NSString *)cacheFileDirectory;
+
 - (void)writeTempFileData:(NSData *)date offset:(NSUInteger)offset;
 - (NSData *)readTempFileDataWithRange:(NSRange)fileRange;
 

@@ -216,7 +216,6 @@
 		4947F78C1BE996AC003093C8 /* Player */ = {
 			isa = PBXGroup;
 			children = (
-				DCECF3122081E65C002E8CD6 /* ANYLoader */,
 				CCD7ECC11E72A1E500A9207F /* ZFNavigationController */,
 				CC2CC6301CA24D4B0028BBDD /* ZFPlayer */,
 				CC725C1E1C894C8100C3EAF2 /* NetVideo */,
@@ -287,6 +286,7 @@
 		CC2CC6301CA24D4B0028BBDD /* ZFPlayer */ = {
 			isa = PBXGroup;
 			children = (
+				DCECF3122081E65C002E8CD6 /* ANYLoader */,
 				CC2877C51D9B60760097CEDA /* Category */,
 				CC2CC6331CA24D4B0028BBDD /* ZFPlayer.bundle */,
 				CC2CC6541CA38A710028BBDD /* ZFPlayer.h */,
@@ -412,15 +412,15 @@
 		DCECF3122081E65C002E8CD6 /* ANYLoader */ = {
 			isa = PBXGroup;
 			children = (
-				DCECF3162081E65C002E8CD6 /* ANYCacheHandle.h */,
-				DCECF31E2081E65C002E8CD6 /* ANYRequestDataTask.h */,
-				DCECF3182081E65C002E8CD6 /* ANYRequestTask.h */,
-				DCECF3152081E65C002E8CD6 /* ANYResourceLoader.h */,
-				DCECF31F2081E65C002E8CD6 /* ANYCacheHandle.m */,
-				DCECF3132081E65C002E8CD6 /* ANYRequestDataTask.m */,
-				DCECF3142081E65C002E8CD6 /* ANYRequestTask.m */,
-				DCECF3172081E65C002E8CD6 /* ANYResourceLoader.m */,
 				DCECF3192081E65C002E8CD6 /* ANYCategory */,
+				DCECF3162081E65C002E8CD6 /* ANYCacheHandle.h */,
+				DCECF31F2081E65C002E8CD6 /* ANYCacheHandle.m */,
+				DCECF31E2081E65C002E8CD6 /* ANYRequestDataTask.h */,
+				DCECF3132081E65C002E8CD6 /* ANYRequestDataTask.m */,
+				DCECF3182081E65C002E8CD6 /* ANYRequestTask.h */,
+				DCECF3142081E65C002E8CD6 /* ANYRequestTask.m */,
+				DCECF3152081E65C002E8CD6 /* ANYResourceLoader.h */,
+				DCECF3172081E65C002E8CD6 /* ANYResourceLoader.m */,
 			);
 			path = ANYLoader;
 			sourceTree = "<group>";
