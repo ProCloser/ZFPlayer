@@ -26,6 +26,9 @@
 #import <MediaPlayer/MediaPlayer.h>
 #import "UIView+CustomControlView.h"
 #import "ZFPlayer.h"
+#import "ANYResourceLoader.h"
+#import "NSURL+ANYAdd.h"
+#import "ANYCacheHandle.h"
 
 #define CellPlayerFatherViewTag  200
 
@@ -40,6 +43,8 @@ typedef NS_ENUM(NSInteger, PanDirection){
 };
 
 @interface ZFPlayerView () <UIGestureRecognizerDelegate,UIAlertViewDelegate>
+
+@property (nonatomic, strong) ANYResourceLoader     *resourceLoader;
 
 /** 播放属性 */
 @property (nonatomic, strong) AVPlayer               *player;
@@ -368,9 +373,28 @@ typedef NS_ENUM(NSInteger, PanDirection){
  *  设置Player相关参数
  */
 - (void)configZFPlayer {
-    self.urlAsset = [AVURLAsset assetWithURL:self.videoURL];
+//    self.urlAsset = [AVURLAsset assetWithURL:self.videoURL];
     // 初始化playerItem
+    
+    self.resourceLoader = [[ANYResourceLoader alloc] init];
+//    self.resourceLoader.delegate = self;
+    
+    NSString *cachePath = [ANYCacheHandle cacheFileExistsWithURL:self.videoURL];
+
+    if ([self.videoURL.pathExtension isEqualToString:@"m3u8"]) {
+        self.urlAsset = [AVURLAsset URLAssetWithURL:self.videoURL options:nil];
+    }else{
+        if (cachePath.length) {
+            self.urlAsset = [AVURLAsset URLAssetWithURL:[NSURL fileURLWithPath:cachePath] options:nil];
+        }else{
+            self.urlAsset = [AVURLAsset URLAssetWithURL:[self.videoURL any_customSchemeURL] options:nil];
+        }
+    }
+    [self.urlAsset.resourceLoader setDelegate:self.resourceLoader queue:dispatch_get_main_queue()];
+    
     self.playerItem = [AVPlayerItem playerItemWithAsset:self.urlAsset];
+
+    
     // 每次都重新创建Player，替换replaceCurrentItemWithPlayerItem:，该方法阻塞线程
     self.player = [AVPlayer playerWithPlayerItem:self.playerItem];
     

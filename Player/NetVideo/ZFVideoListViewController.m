@@ -41,6 +41,7 @@
                          @"http://120.25.226.186:32812/resources/videos/minion_06.mp4",
                          @"http://120.25.226.186:32812/resources/videos/minion_07.mp4",
                          @"http://120.25.226.186:32812/resources/videos/minion_08.mp4",
+                         @"http://video.zhiyulab.com/95f233a052af46ffb1951a044cf6c3d2/fb94f130e44a44de92cdba3be72b3e3c-3c0ca901ba2186e45fd3e3365a22666f.m3u8",
                          @"http://static.smartisanos.cn/common/video/proud-farmer.mp4"];
 }
 
