@@ -227,13 +227,18 @@ typedef NS_ENUM(NSInteger, PanDirection){
 }
 
 - (void)playerControlView:(UIView *)controlView playerModel:(ZFPlayerModel *)playerModel {
-    if (!controlView) {
-        // 指定默认控制层
-        ZFPlayerControlView *defaultControlView = [[ZFPlayerControlView alloc] init];
-        self.controlView = defaultControlView;
-    } else {
-        self.controlView = controlView;
+    if(_controlView){
+        
+    }else{
+        if (!controlView) {
+            // 指定默认控制层
+            ZFPlayerControlView *defaultControlView = [[ZFPlayerControlView alloc] init];
+            self.controlView = defaultControlView;
+        } else {
+            self.controlView = controlView;
+        }
     }
+    
     self.playerModel = playerModel;
 }
 
@@ -381,7 +386,7 @@ typedef NS_ENUM(NSInteger, PanDirection){
     
     NSString *cachePath = [ANYCacheHandle cacheFileExistsWithURL:self.videoURL];
 
-    if ([self.videoURL.pathExtension isEqualToString:@"m3u8"]) {
+    if ([self.videoURL.pathExtension isEqualToString:@"m3u8"] || [self.videoURL.scheme isEqualToString:@"file"]) {
         self.urlAsset = [AVURLAsset URLAssetWithURL:self.videoURL options:nil];
     }else{
         if (cachePath.length) {
