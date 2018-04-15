@@ -84,6 +84,8 @@ typedef NS_ENUM(NSInteger, ZFPlayerState) {
 /// 播放时候默认自动全屏
 @property (nonatomic, assign) BOOL                    fullScreenPlay;
 
+@property (nonatomic, assign) BOOL                    fullScreenBtnHidden;
+
 /**
  *  单例，用于列表cell上多个视频
  *

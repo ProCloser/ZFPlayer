@@ -1778,6 +1778,10 @@ typedef NS_ENUM(NSInteger, PanDirection){
     return self.isFullScreen;
 }
 
+-(BOOL)zf_PlayerViewHideFullScreenBtn{
+    return self.fullScreenBtnHidden;
+}
+
 #pragma clang diagnostic pop
 
 @end

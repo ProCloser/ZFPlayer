@@ -67,4 +67,6 @@
 
 - (BOOL)zf_PlayerViewWillEnterFullScreen;
 
+- (BOOL)zf_PlayerViewHideFullScreenBtn;
+
 @end

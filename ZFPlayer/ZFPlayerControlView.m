@@ -305,6 +305,8 @@ static const CGFloat ZFPlayerControlBarAutoFadeOutTimeInterval = 0.35f;
 - (void)layoutSubviews {
     [super layoutSubviews];
     
+    _fullScreenBtn.hidden = [self.delegate zf_PlayerViewHideFullScreenBtn];
+
     if([self.delegate respondsToSelector:@selector(zf_PlayerViewWillEnterFullScreen)]){
         if([self.delegate zf_PlayerViewWillEnterFullScreen]){
             [self setOrientationLandscapeConstraint];
