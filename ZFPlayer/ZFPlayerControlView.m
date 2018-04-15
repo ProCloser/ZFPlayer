@@ -305,12 +305,20 @@ static const CGFloat ZFPlayerControlBarAutoFadeOutTimeInterval = 0.35f;
 - (void)layoutSubviews {
     [super layoutSubviews];
     
-    UIInterfaceOrientation currentOrientation = [UIApplication sharedApplication].statusBarOrientation;
-    if (currentOrientation == UIDeviceOrientationPortrait) {
-        [self setOrientationPortraitConstraint];
-    } else {
-        [self setOrientationLandscapeConstraint];
+    if([self.delegate respondsToSelector:@selector(zf_PlayerViewWillEnterFullScreen)]){
+        if([self.delegate zf_PlayerViewWillEnterFullScreen]){
+            [self setOrientationLandscapeConstraint];
+        }else{
+            [self setOrientationPortraitConstraint];
+        }
     }
+    
+//    UIInterfaceOrientation currentOrientation = [UIApplication sharedApplication].statusBarOrientation;
+//    if (currentOrientation == UIDeviceOrientationPortrait) {
+//        [self setOrientationPortraitConstraint];
+//    } else {
+//        [self setOrientationLandscapeConstraint];
+//    }
 }
 
 #pragma mark - Action
@@ -361,7 +369,7 @@ static const CGFloat ZFPlayerControlBarAutoFadeOutTimeInterval = 0.35f;
     // 状态条的方向旋转的方向,来判断当前屏幕的方向
     UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
     // 在cell上并且是竖屏时候响应关闭事件
-    if (self.isCellVideo && orientation == UIInterfaceOrientationPortrait) {
+    if (self.isCellVideo && !self.isFullScreen) {
         if ([self.delegate respondsToSelector:@selector(zf_controlView:closeAction:)]) {
             [self.delegate zf_controlView:self closeAction:sender];
         }

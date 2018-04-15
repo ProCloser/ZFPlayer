@@ -197,10 +197,10 @@ typedef NS_ENUM(NSInteger, PanDirection){
                                                  name:UIDeviceOrientationDidChangeNotification
                                                object:nil];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onStatusBarOrientationChange)
-                                                 name:UIApplicationDidChangeStatusBarOrientationNotification
-                                               object:nil];
+//    [[NSNotificationCenter defaultCenter] addObserver:self
+//                                             selector:@selector(onStatusBarOrientationChange)
+//                                                 name:UIApplicationDidChangeStatusBarOrientationNotification
+//                                               object:nil];
 }
 
 #pragma mark - layoutSubviews
@@ -726,33 +726,37 @@ typedef NS_ENUM(NSInteger, PanDirection){
     self.isFullScreen = NO;
 }
 
-- (void)toOrientation:(UIInterfaceOrientation)orientation {
+- (void)toOrientation:(UIInterfaceOrientation)orientation{
+    [self toOrientation:orientation bExit:NO];
+}
+
+- (void)toOrientation:(UIInterfaceOrientation)orientation bExit:(BOOL)bExit{
     // 获取到当前状态条的方向
     UIInterfaceOrientation currentOrientation = [UIApplication sharedApplication].statusBarOrientation;
     // 判断如果当前方向和要旋转的方向一致,那么不做任何操作
     if (currentOrientation == orientation) { return; }
     
-    // 根据要旋转的方向,使用Masonry重新修改限制
-    if (orientation != UIInterfaceOrientationPortrait) {//
-        // 这个地方加判断是为了从全屏的一侧,直接到全屏的另一侧不用修改限制,否则会出错;
-        if (currentOrientation == UIInterfaceOrientationPortrait) {
-            [self removeFromSuperview];
-            ZFBrightnessView *brightnessView = [ZFBrightnessView sharedBrightnessView];
-            [[UIApplication sharedApplication].keyWindow bringSubviewToFront:brightnessView];
-            [[UIApplication sharedApplication].keyWindow insertSubview:self belowSubview:brightnessView];
-            [self mas_remakeConstraints:^(MASConstraintMaker *make) {
-                if (self.forcePortrait) {
-                    make.width.equalTo(@(ScreenWidth));
-                    make.center.equalTo([UIApplication sharedApplication].keyWindow);
-                    make.top.equalTo(@([self.class getNavBarTopHeight]));
-                    make.bottom.equalTo(@0);
-                } else {
-                    make.width.equalTo(@(ScreenHeight));
-                    make.height.equalTo(@(ScreenWidth));
-                    make.center.equalTo([UIApplication sharedApplication].keyWindow);
-                }
-            }];
-        }
+    
+    CGRect wframe = [[UIApplication sharedApplication] keyWindow].frame;
+     
+    if(!bExit){
+        [self removeFromSuperview];
+        ZFBrightnessView *brightnessView = [ZFBrightnessView sharedBrightnessView];
+        [[UIApplication sharedApplication].keyWindow bringSubviewToFront:brightnessView];
+        [[UIApplication sharedApplication].keyWindow insertSubview:self belowSubview:brightnessView];
+        [self mas_remakeConstraints:^(MASConstraintMaker *make) {
+            if (self.forcePortrait || orientation == UIInterfaceOrientationPortrait) {
+                make.width.equalTo(@(wframe.size.width));
+                make.height.equalTo(@(wframe.size.height));
+                make.center.equalTo([UIApplication sharedApplication].keyWindow);
+//                make.top.equalTo(@([self.class getNavBarTopHeight]));
+//                make.bottom.equalTo(@0);
+            } else {
+                make.width.equalTo(@(wframe.size.height));
+                make.height.equalTo(@(wframe.size.width));
+                make.center.equalTo([UIApplication sharedApplication].keyWindow);
+            }
+        }];
     }
     // iOS6.0之后,设置状态条的方法能使用的前提是shouldAutorotate为NO,也就是说这个视图控制器内,旋转要关掉;
     // 也就是说在实现这个方法的时候-(BOOL)shouldAutorotate返回值要为NO
@@ -820,6 +824,7 @@ typedef NS_ENUM(NSInteger, PanDirection){
     if (ZFPlayerShared.isLockScreen) { return; }
     if (self.didEnterBackground) { return; };
     if (self.playerPushedOrPresented) { return; }
+    if (!self.isFullScreen) { return; }
     UIDeviceOrientation orientation = [UIDevice currentDevice].orientation;
     UIInterfaceOrientation interfaceOrientation = (UIInterfaceOrientation)orientation;
     if (orientation == UIDeviceOrientationFaceUp || orientation == UIDeviceOrientationFaceDown || orientation == UIDeviceOrientationUnknown ) { return; }
@@ -919,7 +924,8 @@ typedef NS_ENUM(NSInteger, PanDirection){
     ZFPlayerShared.isLockScreen = NO;
     [self.controlView zf_playerLockBtnState:NO];
     self.isLocked = NO;
-    [self interfaceOrientation:UIInterfaceOrientationPortrait];
+//    [self interfaceOrientation:UIInterfaceOrientationPortrait];
+    [self _exitFullScreen];
 }
 
 - (void)changeStatusBackgroundColor:(UIColor *)color {
@@ -1057,24 +1063,86 @@ typedef NS_ENUM(NSInteger, PanDirection){
 
 /** 全屏 */
 - (void)_fullScreenAction {
-    self.statusOriginBackgroundColor = [self getOriginStatusBackgroundColor];
     if (ZFPlayerShared.isLockScreen) {
         [self unLockTheScreen];
         return;
     }
     if (self.isFullScreen) {
-        [self interfaceOrientation:UIInterfaceOrientationPortrait];
-        self.isFullScreen = NO;
+//        [self interfaceOrientation:UIInterfaceOrientationPortrait];
+//        self.isFullScreen = NO;
+        
+        [self _exitFullScreen];
+
         return;
     } else {
-        UIDeviceOrientation orientation = [UIDevice currentDevice].orientation;
-        if (orientation == UIDeviceOrientationLandscapeRight) {
-            [self interfaceOrientation:UIInterfaceOrientationLandscapeLeft];
-        } else {
-            [self interfaceOrientation:UIInterfaceOrientationLandscapeRight];
-        }
-        self.isFullScreen = YES;
+        self.statusOriginBackgroundColor = [self getOriginStatusBackgroundColor];
+        [self _enterFullScreen];
+        
+//        UIDeviceOrientation orientation = [UIDevice currentDevice].orientation;
+//        if (orientation == UIDeviceOrientationLandscapeRight) {
+//            [self interfaceOrientation:UIInterfaceOrientationLandscapeLeft];
+//        } else {
+//            [self interfaceOrientation:UIInterfaceOrientationLandscapeRight];
+//        }
+//        self.isFullScreen = YES;
     }
+}
+
+- (void)_enterFullScreen{
+    [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:NO];
+
+    self.isFullScreen = YES;
+
+    [self removeFromSuperview];
+    
+    ZFBrightnessView *brightnessView = [ZFBrightnessView sharedBrightnessView];
+    [[UIApplication sharedApplication].keyWindow bringSubviewToFront:brightnessView];
+    [[UIApplication sharedApplication].keyWindow insertSubview:self belowSubview:brightnessView];
+    [self mas_remakeConstraints:^(MASConstraintMaker *make) {
+    
+            make.width.equalTo(@(ScreenWidth));
+            make.height.equalTo(@(ScreenHeight));
+//            make.center.equalTo([UIApplication sharedApplication].keyWindow);
+//            make.top.equalTo(@([self.class getNavBarTopHeight]));
+//            make.bottom.equalTo(@0);
+        
+    }];
+//    [self changeStatusBackgroundColor:self.backgroundColor];
+}
+
+- (void)_exitFullScreen{
+//    [self changeStatusBackgroundColor:self.statusOriginBackgroundColor];
+    [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:NO];
+    
+    self.isFullScreen = NO;
+
+    if (self.isCellVideo) {
+        if ([self.scrollView isKindOfClass:[UITableView class]]) {
+            UITableView *tableView = (UITableView *)self.scrollView;
+            UITableViewCell *cell = [tableView cellForRowAtIndexPath:self.indexPath];
+            self.isBottomVideo = NO;
+            if (![tableView.visibleCells containsObject:cell]) {
+                [self updatePlayerViewToBottom];
+            } else {
+                UIView *fatherView = [cell.contentView viewWithTag:self.playerModel.fatherViewTag];
+                [self addPlayerToFatherView:fatherView];
+            }
+        } else if ([self.scrollView isKindOfClass:[UICollectionView class]]) {
+            UICollectionView *collectionView = (UICollectionView *)self.scrollView;
+            UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:self.indexPath];
+            self.isBottomVideo = NO;
+            if (![collectionView.visibleCells containsObject:cell]) {
+                [self updatePlayerViewToBottom];
+            } else {
+                UIView *fatherView = [cell viewWithTag:self.playerModel.fatherViewTag];
+                [self addPlayerToFatherView:fatherView];
+            }
+        }
+    } else {
+        [self addPlayerToFatherView:self.playerModel.fatherView];
+    }
+    
+    [self toOrientation:UIInterfaceOrientationPortrait bExit:YES];
 }
 
 #pragma mark - NSNotification Action
@@ -1478,7 +1546,7 @@ typedef NS_ENUM(NSInteger, PanDirection){
 - (void)setShrinkRightBottomPoint:(CGPoint)shrinkRightBottomPoint {
     _shrinkRightBottomPoint = shrinkRightBottomPoint;
     CGFloat width = ScreenWidth*0.5-20;
-    CGFloat height = (self.bounds.size.height / self.bounds.size.width);
+    CGFloat height =  9/16.f;//(self.bounds.size.height / self.bounds.size.width);
     [self mas_remakeConstraints:^(MASConstraintMaker *make) {
         make.width.mas_equalTo(width);
         make.height.equalTo(self.mas_width).multipliedBy(height);
@@ -1552,7 +1620,8 @@ typedef NS_ENUM(NSInteger, PanDirection){
             [self pause];
             if ([self.delegate respondsToSelector:@selector(zf_playerBackAction)]) { [self.delegate zf_playerBackAction]; }
         } else {
-            [self interfaceOrientation:UIInterfaceOrientationPortrait];
+//            [self interfaceOrientation:UIInterfaceOrientationPortrait];
+            [self _exitFullScreen];
         }
     }
 }
@@ -1703,6 +1772,10 @@ typedef NS_ENUM(NSInteger, PanDirection){
     if ([self.delegate respondsToSelector:@selector(zf_playerControlViewWillHidden:isFullscreen:)]) {
         [self.delegate zf_playerControlViewWillHidden:controlView isFullscreen:fullscreen];
     }
+}
+
+-(BOOL)zf_PlayerViewWillEnterFullScreen{
+    return self.isFullScreen;
 }
 
 #pragma clang diagnostic pop
