@@ -26,5 +26,7 @@
 //#import "ZFPlayer.h"
 
 @interface ZFPlayerControlView : UIView 
+/** 返回按钮*/
+@property (nonatomic, strong) UIButton                *backBtn;
 
 @end

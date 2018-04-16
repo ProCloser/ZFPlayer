@@ -53,8 +53,7 @@ static const CGFloat ZFPlayerControlBarAutoFadeOutTimeInterval = 0.35f;
 @property (nonatomic, strong) UIButton                *lockBtn;
 /** 系统菊花 */
 @property (nonatomic, strong) MMMaterialDesignSpinner *activity;
-/** 返回按钮*/
-@property (nonatomic, strong) UIButton                *backBtn;
+
 /** 关闭按钮*/
 @property (nonatomic, strong) UIButton                *closeBtn;
 /** 重播按钮 */
