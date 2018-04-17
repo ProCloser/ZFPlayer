@@ -1108,6 +1108,10 @@ typedef NS_ENUM(NSInteger, PanDirection){
         
     }];
 //    [self changeStatusBackgroundColor:self.backgroundColor];
+    
+    if ([self.delegate respondsToSelector:@selector(zf_playerViewWillEnterFullScreen:)]) {
+        [self.delegate zf_playerViewWillEnterFullScreen:_controlView];
+    }
 }
 
 - (void)_exitFullScreen{
@@ -1143,6 +1147,10 @@ typedef NS_ENUM(NSInteger, PanDirection){
     }
     
     [self toOrientation:UIInterfaceOrientationPortrait bExit:YES];
+    
+    if ([self.delegate respondsToSelector:@selector(zf_playerViewWillExitFullScreen:)]) {
+        [self.delegate zf_playerViewWillExitFullScreen:_controlView];
+    }
 }
 
 #pragma mark - NSNotification Action
